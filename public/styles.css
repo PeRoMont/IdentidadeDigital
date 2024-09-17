@@ -1,0 +1,251 @@
+/* Estilos globais */
+body {
+  margin: 0;
+  font-family: 'cursive', sans-serif;
+  background: linear-gradient(to right, #6a11cb, #2575fc);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Timer */
+#timer {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #ffffff;
+  color: #333;
+  padding: 15px;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100; /* Adiciona prioridade para que ele fique acima de outros elementos */
+}
+
+/* Container principal */
+.container {
+  position: relative; /* Garante que a container e seus filhos fiquem acima da camada de fundo */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1; /* Define um nível acima da camada de fundo */
+}
+
+/* Adicione esta regra para a classe background-lines */
+.background-lines {
+  position: absolute; /* Garante que a camada de linhas fique atrás de outros conteúdos */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.3) 25%, transparent 25%) -50px 0,
+              linear-gradient(-45deg, rgba(255, 255, 255, 0.3) 25%, transparent 25%) -50px 0,
+              linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.3) 55%),
+              linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.3) 55%);
+  background-size: 100px 100px;
+  background-repeat: repeat;
+  z-index: 0; /* Define o nível mais baixo */
+}
+
+/* Box para nome e perguntas */
+.box {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  max-width: 400px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Título */
+h1 {
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+/* Campo de texto */
+input[type="text"] {
+  width: 100%;
+  max-width: 350px;
+  padding: 10px;
+  font-size: 18px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+/* Botão */
+button {
+  padding: 15px 30px;
+  font-size: 18px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+/* Contêiner de perguntas */
+#questionContainer {
+  width: 1000px;
+  height: 500px; /* Ajuste a altura conforme necessário */
+  padding: 40px;
+  box-sizing: content-box;
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+/* Contêiner de perguntas */
+.answers-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 10px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 30%;
+  padding: 10px;
+  box-sizing: border-box;
+  z-index: 10; /* Define a prioridade mais baixa que o timer */
+}
+
+/* Estilos para botões de resposta */
+.answer {
+  padding: 20px;
+  font-size: 20px;
+  color: white;
+  border-radius: 15px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  transition: background-color 0.3s, transform 0.3s;
+  height: 100%;
+  width: 100%;
+}
+
+#finalRanking {
+  background-color: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
+  margin-top: 20px;
+}
+
+#rankingList {
+  list-style-type: none;
+  padding: 0;
+}
+
+#rankingList li {
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+#finalRanking p {
+  font-size: 16px;
+  color: #333;
+  margin-top: 20px;
+}
+
+
+.answer:hover {
+  transform: scale(1.05);
+}
+
+.kahoot-yellow {
+  background-color: #F2C94C;
+}
+
+.kahoot-red {
+  background-color: #EB5757;
+}
+
+.kahoot-green {
+  background-color: #27AE60;
+}
+
+.kahoot-blue {
+  background-color: #2D9CDB;
+}
+
+.gray-disabled {
+  background-color: #A9A9A9;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.answer.correct {
+  background-color: #285e28;
+  box-shadow: 0px 0px 15px rgba(21, 133, 21, 0.5);
+}
+
+#scoreDisplay {
+    position: fixed; /* Fixa o placar na tela */
+    top: 10px; /* Distância do topo */
+    left: 10px; /* Distância da esquerda */
+    font-size: 18px; /* Tamanho da fonte */
+    background-color: rgba(0, 0, 0, 0.5); /* Fundo semitransparente */
+    color: white; /* Cor do texto */
+    padding: 10px; /* Espaçamento interno */
+    border-radius: 8px; /* Bordas arredondadas */
+    z-index: 1000; /* Para garantir que o placar fique acima de outros elementos */
+}
+
+.watermark {
+  position: absolute; /* Posiciona a imagem de forma absoluta */
+  bottom: 10px; /* Distância do fundo da tela */
+  right: 10px; /* Distância da borda direita da tela */
+  opacity: 1; /* Define a transparência da imagem */
+  pointer-events: none; /* Garante que a marca d'água não interfira na interação com outros elementos */
+  width: 200px; /* Ajuste o tamanho da imagem conforme necessário */
+  height: auto; /* Mantém a proporção da imagem */
+  z-index: -1; /* Garante que a marca d'água fique atrás de outros conteúdos */
+}
+
+/* Container da caixa de boas-vindas */
+#inputNameContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Título de boas-vindas */
+#welcomeTitle {
+  margin-bottom: 20px; /* Espaçamento abaixo do título */
+  font-size: 24px; /* Tamanho da fonte do título */
+  font-weight: bold; /* Negrito no texto */
+  color: #333; /* Cor do texto */
+  text-align: center; /* Centraliza o texto */
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 600px) {
+  .answer {
+    font-size: 16px;
+    padding: 15px;
+    height: 80px;
+  }
+}

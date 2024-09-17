@@ -1,0 +1,75 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to right, #6a11cb, #2575fc);
+  color: #fff;
+}
+
+#adminTitle {
+  text-align: center;
+  padding: 20px;
+  font-size: 24px;
+}
+
+.admin-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.admin-actions {
+  margin-bottom: 20px;
+}
+
+#startGameButton {
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  background-color: #0072ff;
+  color: #fff;
+  cursor: pointer;
+}
+
+#startGameButton:hover {
+  background-color: #005bb5;
+}
+
+.players-list {
+  margin-top: 20px;
+}
+
+#playersContainer {
+  margin-top: 10px;
+}
+
+/* Lista de jogadores */
+#playerList {
+  margin: 20px;
+}
+
+.player-item {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.player-name {
+  font-weight: bold;
+}
+
+.player-score {
+  color: #008000;
+}
+
+.player-item {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.player-name {
+  font-weight: bold;
+}
+
+.player-score {
+  color: #008000;
+}
