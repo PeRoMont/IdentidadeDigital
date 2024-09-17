@@ -1,0 +1,10 @@
+{
+    "public": "public",
+    "routes": [
+      {
+        "src": "/admin/(.*)",
+        "dest": "/public/admin/$1"
+      }
+    ]
+  }
+  
