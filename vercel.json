@@ -1,9 +1,8 @@
 {
-    "public": "public",
     "routes": [
       {
         "src": "/admin/(.*)",
-        "dest": "/public/admin/$1"
+        "dest": "/admin/$1"
       }
     ]
   }
