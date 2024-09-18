@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const timerElement = document.getElementById('timer');
     const questionImage = document.getElementById('questionImage');
     const scoreDisplay = document.createElement('div');
-    const socket = io('https://quiz-identidade-digital.vercel.app');
+    const socket = io();
     let countdown;
     let answering = false;
     let isFinalQuestion = false;
