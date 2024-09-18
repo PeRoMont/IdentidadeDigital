@@ -195,8 +195,8 @@ io.on('connection', (socket) => {
   // Adicionar jogador à lista de jogadores
   socket.on('joinGame', (data) => {
     const { playerName } = data;
-    players[socket.id] = { name: playerName, score: 0 };
-    console.log(`${playerName} conectado`);
+    players[socket.id] = { name: playerName || 'Desconhecido', score: 0 }; // Define 'Desconhecido' se o nome não for fornecido
+    console.log(`${playerName || 'Desconhecido'} conectado`);
     io.emit('updatePlayers', Object.values(players));
     socket.emit('welcomeMessage', 'Aguardando o início do jogo...');
   });
@@ -214,6 +214,7 @@ io.on('connection', (socket) => {
   // Quando um jogador envia uma resposta
   socket.on('answer', (answer) => {
     if (gameStarted && !answers[socket.id]) {
+      if (players[socket.id]) { // Verifique se o jogador está registrado
         answers[socket.id] = answer;
 
         if (answer === questions[currentQuestionIndex].correct) {
@@ -225,10 +226,13 @@ io.on('connection', (socket) => {
 
         // Se todos responderam ou o tempo expirou, mostre a resposta correta
         if (checkIfAllAnswered()) {
-            showCorrectAnswer();
+          showCorrectAnswer();
         }
 
         updatePlayerScore(socket); // Atualiza e envia a pontuação do jogador
+      } else {
+        console.error('Jogador não encontrado:', socket.id);
+      }
     }
   });
 
