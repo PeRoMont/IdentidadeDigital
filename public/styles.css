@@ -101,7 +101,7 @@ button {
 /* Contêiner de perguntas */
 #questionContainer {
   width: 1000px;
-  height: 600px; /* Ajuste a altura conforme necessário */
+  height: 500px; /* Ajuste a altura conforme necessário */
   padding: 40px;
   box-sizing: content-box;
   background-color: #fff;
