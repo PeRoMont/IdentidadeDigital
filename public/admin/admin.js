@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const startGameButton = document.getElementById('startGameButton');
   const playersContainer = document.getElementById('playersContainer');
 
-  const socket = io('https://quiz-identidade-digital.vercel.app');
+  const socket = io();
 
   // Função para formatar a pontuação
   function formatScore(score) {
