@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isFinalQuestion = false;
     let allQuestionsAnswered = false; // Flag para verificar se todas as perguntas foram respondidas
     let players = []; // Lista global de jogadores
+    let timeLeft = 20; // Tempo inicial de 20 segundos
 
     // Adicionar a div de pontuação ao DOM
     scoreDisplay.id = 'playerScore';
@@ -46,26 +47,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Função para iniciar o timer
-    function startTimer(duration) {
-        let timeRemaining = duration;
-        timerElement.textContent = timeRemaining;
-        timerElement.style.display = 'block';
-
-        if (countdown) {
-            clearInterval(countdown);
-        }
-
-        countdown = setInterval(() => {
-            timeRemaining--;
-            timerElement.textContent = timeRemaining;
-
-            if (timeRemaining <= 0) {
-                clearInterval(countdown);
-                timerElement.style.display = 'none';
-                socket.emit('timeExpired');
-            }
+    function startTimer() {
+        timeLeft = 20;
+        timer = setInterval(() => {
+          timeLeft--;
+          updateTimerDisplay(timeLeft); // Atualiza a exibição do temporizador no cliente
+          
+          if (timeLeft <= 0) {
+            clearInterval(timer);
+            sendTimeout(); // Envia para o servidor que o tempo acabou
+          }
         }, 1000);
-    }
+      }
 
     // Quando o jogo começa
     socket.on('gameStarted', () => {
@@ -111,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isFinalQuestion) return;
       
         resetAnswerButtons();
-        startTimer(20);
+        startTimer();
         questionText.textContent = question.question;
         answerA.textContent = question.answers[0];
         answerB.textContent = question.answers[1];
