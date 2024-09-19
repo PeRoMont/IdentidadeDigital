@@ -148,6 +148,11 @@ function sendQuestion() {
     io.emit('question', questions[currentQuestionIndex], currentQuestionIndex === questions.length - 1);
     answers = {}; // Limpar respostas anteriores
     questionStartTime = Date.now(); // Registrar o início da pergunta
+
+    // Temporizador de 20 segundos para exibir a resposta correta
+    setTimeout(() => {
+      showCorrectAnswer(); // Mostra a resposta correta após 20 segundos
+    }, 20000); // 20 segundos de intervalo
   } else {
     console.log('Fim do jogo. Enviando ranking.');
     sendTop10Players(); // Envia o ranking dos 10 melhores jogadores
@@ -159,9 +164,9 @@ function sendQuestion() {
 function showCorrectAnswer() {
   const currentQuestion = questions[currentQuestionIndex];
   if (currentQuestion) {
-    io.emit('correctAnswer', currentQuestion.correct);
+    io.emit('correctAnswer', currentQuestion.correct); // Envia a resposta correta para os jogadores
 
-    // Espera 3 segundos e depois envia a próxima pergunta ou finaliza o jogo
+    // Espera 3 segundos antes de enviar a próxima pergunta
     setTimeout(() => {
       currentQuestionIndex++;
       if (currentQuestionIndex < questions.length) {
@@ -169,7 +174,7 @@ function showCorrectAnswer() {
       } else {
         sendTop10Players(); // Envia o ranking dos 10 melhores jogadores
       }
-    }, 3000); // Espera 3 segundos antes de enviar a próxima pergunta
+    }, 3000); // Espera 3 segundos após mostrar a resposta
   }
 }
 
@@ -222,16 +227,17 @@ io.on('connection', (socket) => {
   
         if (answer === questions[currentQuestionIndex].correct) {
           const timeTaken = (Date.now() - questionStartTime) / 1000;
-          const score = Math.max(1000 - timeTaken * 50, 0); 
+          const score = Math.max(1000 - timeTaken * 50, 0); // Até 1000 pontos, diminuindo conforme o tempo
           players[socket.id].score += score;
           io.emit('updatePlayers', Object.values(players)); // Atualizar pontuação de todos os jogadores
         }
   
-        if (checkIfAllAnswered()) {
-          showCorrectAnswer();
-        }
-  
         updatePlayerScore(socket);
+  
+        // Mesmo se todos responderem, não avança imediatamente para a próxima pergunta
+        if (checkIfAllAnswered()) {
+          io.emit('allPlayersAnswered'); // Apenas notifica que todos responderam
+        }
       } else {
         console.error('Jogador não encontrado:', socket.id);
       }
