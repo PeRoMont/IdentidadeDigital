@@ -212,6 +212,7 @@ io.on('connection', (socket) => {
     }
   });
 
+  // Quando um jogador envia uma resposta
   socket.on('answer', (answer) => {
     console.log(`Recebendo resposta do jogador ${players[socket.id]?.name}: ${answer}`);
     
@@ -230,7 +231,10 @@ io.on('connection', (socket) => {
         // Atualizar a pontuação do jogador
         updatePlayerScore(socket);
   
-        // Não exibir a resposta correta imediatamente
+        // Verificar se todos responderam
+        if (checkIfAllAnswered()) {
+          showCorrectAnswer(); // Mostra a resposta correta se todos responderem
+        }
       }
     }
   });
