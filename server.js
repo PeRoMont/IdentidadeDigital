@@ -198,7 +198,7 @@ function sendTop10Players() {
 
 // Verificar se todos os jogadores responderam
 function checkIfAllAnswered() {
-  return Object.keys(players).every(playerId => answers[playerId]);
+  return Object.keys(players).length > 0 && Object.keys(players).every(playerId => answers[playerId]);
 }
 
 // Atualizar a pontuação do jogador individualmente e enviar para ele
@@ -231,30 +231,28 @@ io.on('connection', (socket) => {
   // Quando um jogador envia uma resposta
   socket.on('answer', (answer) => {
     console.log(`Recebendo resposta do jogador ${players[socket.id]?.name}: ${answer}`);
-    
+  
     if (gameStarted && !answers[socket.id]) {
       if (players[socket.id]) { 
         console.log(`${players[socket.id].name} respondeu: ${answer}`);
         answers[socket.id] = answer;
   
+        // Verifica se a resposta está correta e atualiza a pontuação
         if (answer === questions[currentQuestionIndex].correct) {
           const timeTaken = (Date.now() - questionStartTime) / 1000;
           const score = Math.max(1000 - timeTaken * 50, 0); // Até 1000 pontos, diminuindo conforme o tempo
           players[socket.id].score += score;
-          io.emit('updatePlayers', Object.values(players)); // Atualizar pontuação de todos os jogadores
         }
   
+        // Atualiza a pontuação do jogador individualmente
         updatePlayerScore(socket);
-        console.log(`Verificando se todos responderam após a resposta de ${players[socket.id].name}`);
+  
+        // Verifica se todos os jogadores responderam
         if (checkIfAllAnswered()) {
-          console.log('Todos os jogadores responderam.');
-          io.emit('allPlayersAnswered'); // Apenas notifica que todos responderam
+          console.log('Todos os jogadores responderam. Mostrando resposta correta.');
+          showCorrectAnswer(); // Mostra a resposta correta quando todos respondem
         }
-      } else {
-        console.error('Jogador não encontrado:', socket.id);
       }
-    } else {
-      console.log('Resposta já recebida ou jogo não iniciado.');
     }
   });
 
