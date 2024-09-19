@@ -212,29 +212,26 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Quando um jogador envia uma resposta
   socket.on('answer', (answer) => {
     console.log(`Recebendo resposta do jogador ${players[socket.id]?.name}: ${answer}`);
     
     if (gameStarted && !answers[socket.id]) {
-      answers[socket.id] = answer;
-
-      // Se a resposta estiver correta, atualizar pontuação
-      if (answer === questions[currentQuestionIndex].correct) {
-        const timeTaken = (Date.now() - questionStartTime) / 1000;
-        const score = Math.max(1000 - timeTaken * 50, 0); // Até 1000 pontos, diminuindo conforme o tempo
-        players[socket.id].score += score;
-        io.emit('updatePlayers', Object.values(players)); // Atualizar pontuação de todos os jogadores
+      if (players[socket.id]) {
+        answers[socket.id] = answer;
+  
+        // Se a resposta estiver correta, atualizar pontuação
+        if (answer === questions[currentQuestionIndex].correct) {
+          const timeTaken = (Date.now() - questionStartTime) / 1000;
+          const score = Math.max(1000 - timeTaken * 50, 0); // Até 1000 pontos, diminuindo conforme o tempo
+          players[socket.id].score += score;
+          io.emit('updatePlayers', Object.values(players)); // Atualizar pontuação de todos os jogadores
+        }
+  
+        // Atualizar a pontuação do jogador
+        updatePlayerScore(socket);
+  
+        // Não exibir a resposta correta imediatamente
       }
-
-      // Atualizar a pontuação do jogador
-      updatePlayerScore(socket);
-
-      // Não verificar se todos os jogadores responderam
-      // Mostrar a resposta correta após um tempo definido
-      setTimeout(() => {
-        showCorrectAnswer();
-      }, 1000); // Aguarda 1 segundo antes de mostrar a resposta correta
     }
   });
 
