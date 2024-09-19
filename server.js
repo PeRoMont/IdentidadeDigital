@@ -143,6 +143,8 @@ let questionStartTime;
 
 // Função para enviar a próxima pergunta
 function sendQuestion() {
+  console.log(`Iniciando a função sendQuestion. Pergunta atual: ${currentQuestionIndex}, Total de perguntas: ${questions.length}`);
+  
   if (currentQuestionIndex < questions.length) {
     console.log('Enviando pergunta:', questions[currentQuestionIndex]);
     io.emit('question', questions[currentQuestionIndex], currentQuestionIndex === questions.length - 1);
@@ -151,6 +153,7 @@ function sendQuestion() {
 
     // Temporizador de 20 segundos para exibir a resposta correta
     setTimeout(() => {
+      console.log('Tempo de 20 segundos expirado, mostrando resposta correta.');
       showCorrectAnswer(); // Mostra a resposta correta após 20 segundos
     }, 20000); // 20 segundos de intervalo
   } else {
@@ -162,19 +165,26 @@ function sendQuestion() {
 
 // Função para mostrar a resposta correta
 function showCorrectAnswer() {
+  console.log('Mostrando a resposta correta para a pergunta:', currentQuestionIndex);
   const currentQuestion = questions[currentQuestionIndex];
+  
   if (currentQuestion) {
     io.emit('correctAnswer', currentQuestion.correct); // Envia a resposta correta para os jogadores
 
     // Espera 3 segundos antes de enviar a próxima pergunta
     setTimeout(() => {
       currentQuestionIndex++;
+      console.log('Indo para a próxima pergunta. Novo índice:', currentQuestionIndex);
+      
       if (currentQuestionIndex < questions.length) {
         sendQuestion(); // Envia a próxima pergunta
       } else {
+        console.log('Fim do jogo. Enviando ranking final.');
         sendTop10Players(); // Envia o ranking dos 10 melhores jogadores
       }
     }, 3000); // Espera 3 segundos após mostrar a resposta
+  } else {
+    console.log('Erro: Pergunta atual não encontrada');
   }
 }
 
@@ -220,6 +230,8 @@ io.on('connection', (socket) => {
 
   // Quando um jogador envia uma resposta
   socket.on('answer', (answer) => {
+    console.log(`Recebendo resposta do jogador ${players[socket.id]?.name}: ${answer}`);
+    
     if (gameStarted && !answers[socket.id]) {
       if (players[socket.id]) { 
         console.log(`${players[socket.id].name} respondeu: ${answer}`);
@@ -233,19 +245,22 @@ io.on('connection', (socket) => {
         }
   
         updatePlayerScore(socket);
-  
-        // Mesmo se todos responderem, não avança imediatamente para a próxima pergunta
+        console.log(`Verificando se todos responderam após a resposta de ${players[socket.id].name}`);
         if (checkIfAllAnswered()) {
+          console.log('Todos os jogadores responderam.');
           io.emit('allPlayersAnswered'); // Apenas notifica que todos responderam
         }
       } else {
         console.error('Jogador não encontrado:', socket.id);
       }
+    } else {
+      console.log('Resposta já recebida ou jogo não iniciado.');
     }
   });
 
   // Quando o tempo expira
   socket.on('timeExpired', () => {
+    console.log("Tempo expirado para a pergunta:", currentQuestionIndex);
     if (gameStarted && !checkIfAllAnswered()) {
       console.log("Tempo expirado. Mostrando resposta correta.");
       showCorrectAnswer(); // Mostra a resposta correta se o tempo acabar e nem todos tiverem respondido
