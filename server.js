@@ -146,7 +146,6 @@ function sendQuestion() {
   console.log(`Enviando a pergunta ${currentQuestionIndex} para os jogadores.`);
   
   if (currentQuestionIndex < questions.length) {
-    // Enviar a pergunta para os jogadores
     io.emit('question', questions[currentQuestionIndex], currentQuestionIndex === questions.length - 1);
     answers = {}; // Limpar respostas anteriores
     questionStartTime = Date.now(); // Registrar o início da pergunta
@@ -186,11 +185,6 @@ function sendTop10Players() {
   io.emit('endGame', { players: sortedPlayers, message: 'Obrigado por participar!' });
 }
 
-// Verificar se todos os jogadores responderam
-function checkIfAllAnswered() {
-  return Object.keys(players).every(playerId => answers[playerId]);
-}
-
 // Atualizar a pontuação do jogador individualmente e enviar para ele
 function updatePlayerScore(socket) {
   socket.emit('playerScoreUpdate', players[socket.id].score.toFixed(0)); // Envia a pontuação do jogador
@@ -219,11 +213,10 @@ io.on('connection', (socket) => {
   });
 
   // Quando um jogador envia uma resposta
-socket.on('answer', (answer) => {
-  console.log(`Recebendo resposta do jogador ${players[socket.id]?.name}: ${answer}`);
-  
-  if (gameStarted && !answers[socket.id]) {
-    if (players[socket.id]) {
+  socket.on('answer', (answer) => {
+    console.log(`Recebendo resposta do jogador ${players[socket.id]?.name}: ${answer}`);
+    
+    if (gameStarted && !answers[socket.id]) {
       answers[socket.id] = answer;
 
       // Se a resposta estiver correta, atualizar pontuação
@@ -237,20 +230,20 @@ socket.on('answer', (answer) => {
       // Atualizar a pontuação do jogador
       updatePlayerScore(socket);
 
-      // Se todos os jogadores responderam, mostrar a resposta correta
-      if (checkIfAllAnswered()) {
+      // Não verificar se todos os jogadores responderam
+      // Mostrar a resposta correta após um tempo definido
+      setTimeout(() => {
         showCorrectAnswer();
-      }
+      }, 1000); // Aguarda 1 segundo antes de mostrar a resposta correta
     }
-  }
-});
+  });
 
   // Quando o tempo expira
   socket.on('timeExpired', () => {
     console.log("Tempo expirado para a pergunta:", currentQuestionIndex);
-    if (gameStarted && !checkIfAllAnswered()) {
+    if (gameStarted) {
       console.log("Tempo expirado. Mostrando resposta correta.");
-      showCorrectAnswer(); // Mostra a resposta correta se o tempo acabar e nem todos tiverem respondido
+      showCorrectAnswer(); // Mostra a resposta correta se o tempo acabar
     }
   });
 
