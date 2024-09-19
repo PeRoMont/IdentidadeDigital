@@ -143,19 +143,13 @@ let questionStartTime;
 
 // Função para enviar a próxima pergunta
 function sendQuestion() {
-  console.log(`Iniciando a função sendQuestion. Pergunta atual: ${currentQuestionIndex}, Total de perguntas: ${questions.length}`);
+  console.log(`Enviando a pergunta ${currentQuestionIndex} para os jogadores.`);
   
   if (currentQuestionIndex < questions.length) {
-    console.log('Enviando pergunta:', questions[currentQuestionIndex]);
+    // Enviar a pergunta para os jogadores
     io.emit('question', questions[currentQuestionIndex], currentQuestionIndex === questions.length - 1);
     answers = {}; // Limpar respostas anteriores
     questionStartTime = Date.now(); // Registrar o início da pergunta
-
-    // Temporizador de 20 segundos para exibir a resposta correta
-    setTimeout(() => {
-      console.log('Tempo de 20 segundos expirado, mostrando resposta correta.');
-      showCorrectAnswer(); // Mostra a resposta correta após 20 segundos
-    }, 20000); // 20 segundos de intervalo
   } else {
     console.log('Fim do jogo. Enviando ranking.');
     sendTop10Players(); // Envia o ranking dos 10 melhores jogadores
@@ -165,26 +159,22 @@ function sendQuestion() {
 
 // Função para mostrar a resposta correta
 function showCorrectAnswer() {
-  console.log('Mostrando a resposta correta para a pergunta:', currentQuestionIndex);
-  const currentQuestion = questions[currentQuestionIndex];
+  console.log('Mostrando a resposta correta.');
   
+  const currentQuestion = questions[currentQuestionIndex];
   if (currentQuestion) {
     io.emit('correctAnswer', currentQuestion.correct); // Envia a resposta correta para os jogadores
 
-    // Espera 3 segundos antes de enviar a próxima pergunta
+    // Esperar um tempo antes de ir para a próxima pergunta
     setTimeout(() => {
       currentQuestionIndex++;
-      console.log('Indo para a próxima pergunta. Novo índice:', currentQuestionIndex);
-      
       if (currentQuestionIndex < questions.length) {
-        sendQuestion(); // Envia a próxima pergunta
+        sendQuestion(); // Enviar a próxima pergunta
       } else {
         console.log('Fim do jogo. Enviando ranking final.');
-        sendTop10Players(); // Envia o ranking dos 10 melhores jogadores
+        sendTop10Players(); // Envia o ranking dos melhores jogadores
       }
     }, 3000); // Espera 3 segundos após mostrar a resposta
-  } else {
-    console.log('Erro: Pergunta atual não encontrada');
   }
 }
 
@@ -198,7 +188,7 @@ function sendTop10Players() {
 
 // Verificar se todos os jogadores responderam
 function checkIfAllAnswered() {
-  return Object.keys(players).length > 0 && Object.keys(players).every(playerId => answers[playerId]);
+  return Object.keys(players).every(playerId => answers[playerId]);
 }
 
 // Atualizar a pontuação do jogador individualmente e enviar para ele
@@ -229,32 +219,31 @@ io.on('connection', (socket) => {
   });
 
   // Quando um jogador envia uma resposta
-  socket.on('answer', (answer) => {
-    console.log(`Recebendo resposta do jogador ${players[socket.id]?.name}: ${answer}`);
+socket.on('answer', (answer) => {
+  console.log(`Recebendo resposta do jogador ${players[socket.id]?.name}: ${answer}`);
   
-    if (gameStarted && !answers[socket.id]) {
-      if (players[socket.id]) { 
-        console.log(`${players[socket.id].name} respondeu: ${answer}`);
-        answers[socket.id] = answer;
-  
-        // Verifica se a resposta está correta e atualiza a pontuação
-        if (answer === questions[currentQuestionIndex].correct) {
-          const timeTaken = (Date.now() - questionStartTime) / 1000;
-          const score = Math.max(1000 - timeTaken * 50, 0); // Até 1000 pontos, diminuindo conforme o tempo
-          players[socket.id].score += score;
-        }
-  
-        // Atualiza a pontuação do jogador individualmente
-        updatePlayerScore(socket);
-  
-        // Verifica se todos os jogadores responderam
-        if (checkIfAllAnswered()) {
-          console.log('Todos os jogadores responderam. Mostrando resposta correta.');
-          showCorrectAnswer(); // Mostra a resposta correta quando todos respondem
-        }
+  if (gameStarted && !answers[socket.id]) {
+    if (players[socket.id]) {
+      answers[socket.id] = answer;
+
+      // Se a resposta estiver correta, atualizar pontuação
+      if (answer === questions[currentQuestionIndex].correct) {
+        const timeTaken = (Date.now() - questionStartTime) / 1000;
+        const score = Math.max(1000 - timeTaken * 50, 0); // Até 1000 pontos, diminuindo conforme o tempo
+        players[socket.id].score += score;
+        io.emit('updatePlayers', Object.values(players)); // Atualizar pontuação de todos os jogadores
+      }
+
+      // Atualizar a pontuação do jogador
+      updatePlayerScore(socket);
+
+      // Se todos os jogadores responderam, mostrar a resposta correta
+      if (checkIfAllAnswered()) {
+        showCorrectAnswer();
       }
     }
-  });
+  }
+});
 
   // Quando o tempo expira
   socket.on('timeExpired', () => {
