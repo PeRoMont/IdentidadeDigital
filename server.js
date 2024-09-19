@@ -144,12 +144,14 @@ let questionStartTime;
 // Função para enviar a próxima pergunta
 function sendQuestion() {
   if (currentQuestionIndex < questions.length) {
-    console.log('Enviando pergunta para os jogadores:', questions[currentQuestionIndex]);
+    console.log('Enviando pergunta:', questions[currentQuestionIndex]);
     io.emit('question', questions[currentQuestionIndex], currentQuestionIndex === questions.length - 1);
     answers = {}; // Limpar respostas anteriores
     questionStartTime = Date.now(); // Registrar o início da pergunta
   } else {
+    console.log('Fim do jogo. Enviando ranking.');
     sendTop10Players(); // Envia o ranking dos 10 melhores jogadores
+    gameStarted = false; // Finaliza o jogo
   }
 }
 
@@ -214,22 +216,22 @@ io.on('connection', (socket) => {
   // Quando um jogador envia uma resposta
   socket.on('answer', (answer) => {
     if (gameStarted && !answers[socket.id]) {
-      if (players[socket.id]) { // Verifique se o jogador está registrado
+      if (players[socket.id]) { 
+        console.log(`${players[socket.id].name} respondeu: ${answer}`);
         answers[socket.id] = answer;
-
+  
         if (answer === questions[currentQuestionIndex].correct) {
-            const timeTaken = (Date.now() - questionStartTime) / 1000;
-            const score = Math.max(1000 - timeTaken * 50, 0); // Até 1000 pontos, diminuindo conforme o tempo
-            players[socket.id].score += score;
-            io.emit('updatePlayers', Object.values(players)); // Atualizar pontuação de todos os jogadores
+          const timeTaken = (Date.now() - questionStartTime) / 1000;
+          const score = Math.max(1000 - timeTaken * 50, 0); 
+          players[socket.id].score += score;
+          io.emit('updatePlayers', Object.values(players)); // Atualizar pontuação de todos os jogadores
         }
-
-        // Se todos responderam ou o tempo expirou, mostre a resposta correta
+  
         if (checkIfAllAnswered()) {
           showCorrectAnswer();
         }
-
-        updatePlayerScore(socket); // Atualiza e envia a pontuação do jogador
+  
+        updatePlayerScore(socket);
       } else {
         console.error('Jogador não encontrado:', socket.id);
       }
@@ -239,6 +241,7 @@ io.on('connection', (socket) => {
   // Quando o tempo expira
   socket.on('timeExpired', () => {
     if (gameStarted && !checkIfAllAnswered()) {
+      console.log("Tempo expirado. Mostrando resposta correta.");
       showCorrectAnswer(); // Mostra a resposta correta se o tempo acabar e nem todos tiverem respondido
     }
   });
