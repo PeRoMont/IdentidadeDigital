@@ -9,7 +9,7 @@
   - Socket IO (servidor);
   - Ngrok (criação de um túnel para conexão dos demais usuários/jogadores).
  
-Consiste em um simples jogo baseado na lógica e gameplay do kahoot, onde as perguntas podem ser cadastradas em quantidade X (sem limites), a lógica e entendimento do mesmo é bem simples:
+- Consiste em um simples jogo baseado na lógica e gameplay do kahoot, onde as perguntas podem ser cadastradas em quantidade X (sem limites), a lógica e entendimento do mesmo é bem simples:
   - Server roda na porta 3000;
   - Pasta com o banco de imagens para ser referênciada em cada pergunta;
   - Cadastro das perguntas diretamente no código do servidor, logo não é armazenada em cache;
